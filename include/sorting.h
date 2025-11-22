@@ -17,9 +17,50 @@ namespace IMD
         // cmp = <
 
         for (auto i = beg; i != std::prev(end); ++i)
+        {
+            bool flag = false;
             for (auto j = std::next(i); j != end; ++j)
+            {
                 if (cmp(*j, *i))
+                {
                     std::swap(*i, *j);
+                    flag = true;
+                }
+            }
+            if (!flag)
+                break;
+        }
+    }
+
+    template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
+    void comb_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
+    {
+        if (beg == end)
+            return;
+
+        size_t size = std::distance(beg, end);
+        size_t gap(std::distance(beg, end));
+        double coeff(1.25);
+        bool flag(true);
+
+        while (gap > 1 || flag)
+        {
+            gap = static_cast<size_t>(gap / coeff);
+            if (gap == 0)
+                gap = 1;
+
+            flag = false;
+
+            for (auto it = beg; it != std::prev(end, gap); ++it)
+            {
+                auto tmp = std::next(it, gap);
+                if (cmp(*tmp, *it))
+                {
+                    std::iter_swap(tmp, it);
+                    flag = true;
+                }
+            }
+        }
     }
 
     template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
