@@ -5,7 +5,7 @@
 int main()
 {
     int *ptr = new int[5]{-2, 0, -5, 4, 1};
-    IMD::selection_sort(ptr, ptr + 5);
+    IMD::counting_sort(ptr, ptr + 5);
 
     std::list<int> lst = {1, 2, 3, 4, 5, 6};
 

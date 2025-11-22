@@ -4,6 +4,8 @@
 #include <functional>
 #include <utility>
 #include <type_traits>
+#include <iterator>
+#include <algorithm>
 
 namespace IMD
 {
@@ -59,6 +61,33 @@ namespace IMD
             if (min_it != i)
                 std::iter_swap(i, min_it);
         }
+    }
+
+    template <typename InputIt>
+    void counting_sort(InputIt beg, InputIt end)
+    {
+        static_assert(std::is_integral_v<typename std::iterator_traits<InputIt>::value_type>, "Counting sort requires integer types");
+
+        if (beg == end)
+            return;
+
+        auto min_max = std::minmax_element(beg, end);
+        auto min_val = *min_max.first;
+        auto max_val = *min_max.second;
+
+        size_t size = max_val - min_val + 1;
+        size_t *counter = new size_t[size]();
+        for (auto it = beg; it != end; ++it)
+            ++counter[*it - min_val];
+
+        auto it = beg;
+        for (size_t i(0); i < size; ++i)
+        {
+            std::fill_n(it, counter[i], static_cast<typename std::iterator_traits<InputIt>::value_type>(i + min_val));
+            std::advance(it, counter[i]);
+        }
+
+        delete[] counter;
     }
 
 }
