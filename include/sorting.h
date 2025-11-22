@@ -42,6 +42,25 @@ namespace IMD
         }
     }
 
+    template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
+    void selection_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
+    {
+        if (beg == end)
+            return;
+        // cmp = <
+
+        for (auto i = beg; i != end; ++i)
+        {
+            auto min_it = i;
+            for (auto j = std::next(i); j != end; ++j)
+                if (cmp(*j, *min_it))
+                    min_it = j;
+
+            if (min_it != i)
+                std::iter_swap(i, min_it);
+        }
+    }
+
 }
 
 #endif
