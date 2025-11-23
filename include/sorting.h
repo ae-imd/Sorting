@@ -12,7 +12,7 @@ namespace IMD
     template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
     void bubble_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
-        if (beg == end)
+        if (std::distance(beg, end) == 1)
             return;
         // cmp = <
 
@@ -35,11 +35,11 @@ namespace IMD
     template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
     void comb_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
-        if (beg == end)
+        size_t size = std::distance(beg, end);
+        if (size == 1)
             return;
 
-        size_t size = std::distance(beg, end);
-        size_t gap(std::distance(beg, end));
+        size_t gap(size);
         double coeff(1.25);
         bool flag(true);
 
@@ -66,7 +66,7 @@ namespace IMD
     template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
     void insertion_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
-        if (beg == end)
+        if (std::distance(beg, end) == 1)
             return;
         // cmp = <
 
@@ -86,9 +86,73 @@ namespace IMD
     }
 
     template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
+    void Shell_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
+    {
+        auto size = std::distance(beg, end);
+        if (size == 1)
+            return;
+
+        for (auto gap = size / 2; gap > 0; gap /= 2)
+        {
+            auto current = std::next(beg, gap);
+
+            for (auto i = gap; i < size; ++i, ++current)
+            {
+                auto tmp = std::move(*current);
+                auto j = current;
+                auto j_gap = std::distance(beg, j);
+
+                while (j_gap >= gap && cmp(tmp, *std::prev(j, gap)))
+                {
+                    *j = std::move(*std::prev(j, gap));
+                    j = std::prev(j, gap);
+                    j_gap = std::distance(beg, j);
+                }
+
+                *j = std::move(tmp);
+            }
+        }
+    }
+
+    template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
+    void Shell_Knuth_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
+    {
+        auto size = std::distance(beg, end);
+        if (size == 1)
+            return;
+
+        auto gap = static_cast<decltype(size)>(1);
+        while (gap < size / 3)
+            gap = 3 * gap + 1;
+
+        while (gap > 0)
+        {
+            auto current = std::next(beg, gap);
+
+            for (auto i = gap; i < size; ++i, ++current)
+            {
+                auto tmp = std::move(*current);
+                auto j = current;
+                auto j_gap = std::distance(beg, j);
+
+                while (j_gap >= gap && cmp(tmp, *std::prev(j, gap)))
+                {
+                    *j = std::move(*std::prev(j, gap));
+                    j = std::prev(j, gap);
+                    j_gap = std::distance(beg, j);
+                }
+
+                *j = std::move(tmp);
+            }
+
+            gap /= 3;
+        }
+    }
+
+    template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
     void selection_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
-        if (beg == end)
+        if (std::distance(beg, end) == 1)
             return;
         // cmp = <
 
@@ -109,7 +173,7 @@ namespace IMD
     {
         static_assert(std::is_integral_v<typename std::iterator_traits<InputIt>::value_type>, "Counting sort requires integer types");
 
-        if (beg == end)
+        if (std::distance(beg, end) == 1)
             return;
 
         auto min_max = std::minmax_element(beg, end);

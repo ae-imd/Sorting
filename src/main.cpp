@@ -8,6 +8,16 @@ void bubble_sort_wrapper(int *beg, int *end)
     IMD::bubble_sort(beg, end);
 }
 
+void Shell_sort(int *beg, int *end)
+{
+    IMD::Shell_sort(beg, end);
+}
+
+void Shell_Knuth_sort(int *beg, int *end)
+{
+    IMD::Shell_Knuth_sort(beg, end);
+}
+
 void insertion_sort_wrapper(int *beg, int *end)
 {
     IMD::insertion_sort(beg, end);
@@ -84,12 +94,14 @@ int main()
 
     std::cout << "Performance comparison on an array of " << AMOUNT << " elements:" << std::endl;
 
-    int *arr = generate_random_array(AMOUNT, -100, 100);
+    int *arr = generate_random_array(AMOUNT, -1'000'000, 1'000'000);
 
     test_sort("Bubble Sort", bubble_sort_wrapper, arr, AMOUNT);
-    test_sort("Insertion Sort", insertion_sort_wrapper, arr, AMOUNT);
-    test_sort("Selection Sort", selection_sort_wrapper, arr, AMOUNT);
     test_sort("Comb Sort", comb_sort_wrapper, arr, AMOUNT);
+    test_sort("Insertion Sort", insertion_sort_wrapper, arr, AMOUNT);
+    test_sort("Shell Sort", Shell_sort, arr, AMOUNT);
+    test_sort("Shell Knuth Sort", Shell_Knuth_sort, arr, AMOUNT);
+    test_sort("Selection Sort", selection_sort_wrapper, arr, AMOUNT);
     test_sort("Counting Sort", counting_sort_wrapper, arr, AMOUNT);
 
     delete[] arr;
