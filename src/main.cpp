@@ -8,12 +8,22 @@ void bubble_sort_wrapper(int *beg, int *end)
     IMD::bubble_sort(beg, end);
 }
 
-void Shell_sort(int *beg, int *end)
+void Hoare_recursive_sort_wrapper(int *beg, int *end)
+{
+    IMD::Hoare_recursive_sort(beg, end);
+}
+
+void Hoare_iterative_sort_wrapper(int *beg, int *end)
+{
+    IMD::Hoare_iterative_sort(beg, end);
+}
+
+void Shell_sort_wrapper(int *beg, int *end)
 {
     IMD::Shell_sort(beg, end);
 }
 
-void Shell_Knuth_sort(int *beg, int *end)
+void Shell_Knuth_sort_wrapper(int *beg, int *end)
 {
     IMD::Shell_Knuth_sort(beg, end);
 }
@@ -90,17 +100,19 @@ void test_sort(const std::string &alg_name, sort_func sf, int *arr, size_t size)
 
 int main()
 {
-    const size_t AMOUNT{100'000};
+    const size_t AMOUNT{1'000'000};
 
     std::cout << "Performance comparison on an array of " << AMOUNT << " elements:" << std::endl;
 
     int *arr = generate_random_array(AMOUNT, -1'000'000, 1'000'000);
+    test_sort("Hoare Iterative Sort", Hoare_recursive_sort_wrapper, arr, AMOUNT);
+    test_sort("Hoare Recursive Sort", Hoare_recursive_sort_wrapper, arr, AMOUNT);
 
     test_sort("Bubble Sort", bubble_sort_wrapper, arr, AMOUNT);
     test_sort("Comb Sort", comb_sort_wrapper, arr, AMOUNT);
     test_sort("Insertion Sort", insertion_sort_wrapper, arr, AMOUNT);
-    test_sort("Shell Sort", Shell_sort, arr, AMOUNT);
-    test_sort("Shell Knuth Sort", Shell_Knuth_sort, arr, AMOUNT);
+    test_sort("Shell Sort", Shell_sort_wrapper, arr, AMOUNT);
+    test_sort("Shell Knuth Sort", Shell_Knuth_sort_wrapper, arr, AMOUNT);
     test_sort("Selection Sort", selection_sort_wrapper, arr, AMOUNT);
     test_sort("Counting Sort", counting_sort_wrapper, arr, AMOUNT);
 

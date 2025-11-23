@@ -6,13 +6,54 @@
 #include <type_traits>
 #include <iterator>
 #include <algorithm>
+#include <stack>
 
 namespace IMD
 {
     template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
+    InputIt Hoare_scheme(InputIt beg, InputIt end, Comparator cmp = Comparator())
+    {
+        auto size = std::distance(beg, end);
+
+        if (size <= 1)
+            return beg;
+
+        auto mid = std::next(beg, size / 2);
+        auto last = std::prev(end);
+
+        // The median of their three
+        if (cmp(*last, *beg))
+            std::iter_swap(beg, last);
+        if (cmp(*mid, *beg))
+            std::iter_swap(beg, mid);
+        if (cmp(*last, *mid))
+            std::iter_swap(mid, last);
+
+        auto pivot = *mid;
+        InputIt left = beg, right = last;
+
+        while (left <= right)
+        {
+            while (cmp(*left, pivot))
+                ++left;
+            while (cmp(pivot, *right))
+                --right;
+
+            if (left <= right)
+            {
+                std::iter_swap(left, right);
+                ++left;
+                --right;
+            }
+        }
+
+        return right;
+    }
+
+    template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
     void bubble_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
-        if (std::distance(beg, end) == 1)
+        if (std::distance(beg, end) <= 1)
             return;
         // cmp = <
 
@@ -36,7 +77,7 @@ namespace IMD
     void comb_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
         size_t size = std::distance(beg, end);
-        if (size == 1)
+        if (size <= 1)
             return;
 
         size_t gap(size);
@@ -66,7 +107,7 @@ namespace IMD
     template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
     void insertion_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
-        if (std::distance(beg, end) == 1)
+        if (std::distance(beg, end) <= 1)
             return;
         // cmp = <
 
@@ -89,7 +130,7 @@ namespace IMD
     void Shell_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
         auto size = std::distance(beg, end);
-        if (size == 1)
+        if (size <= 1)
             return;
 
         for (auto gap = size / 2; gap > 0; gap /= 2)
@@ -118,7 +159,7 @@ namespace IMD
     void Shell_Knuth_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
         auto size = std::distance(beg, end);
-        if (size == 1)
+        if (size <= 1)
             return;
 
         auto gap = static_cast<decltype(size)>(1);
@@ -152,7 +193,7 @@ namespace IMD
     template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
     void selection_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
-        if (std::distance(beg, end) == 1)
+        if (std::distance(beg, end) <= 1)
             return;
         // cmp = <
 
@@ -173,7 +214,7 @@ namespace IMD
     {
         static_assert(std::is_integral_v<typename std::iterator_traits<InputIt>::value_type>, "Counting sort requires integer types");
 
-        if (std::distance(beg, end) == 1)
+        if (std::distance(beg, end) <= 1)
             return;
 
         auto min_max = std::minmax_element(beg, end);
@@ -193,6 +234,40 @@ namespace IMD
         }
 
         delete[] counter;
+    }
+
+    template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
+    void Hoare_recursive_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
+    {
+        if (std::distance(beg, end) <= 1)
+            return;
+
+        InputIt it = Hoare_scheme(beg, end, cmp);
+        Hoare_recursive_sort(beg, std::next(it), cmp);
+        Hoare_recursive_sort(std::next(it), end, cmp);
+    }
+
+    template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
+    void Hoare_iterative_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
+    {
+        if (std::distance(beg, end) <= 1)
+            return;
+
+        std::stack<std::pair<InputIt, InputIt>> st;
+        st.emplace(beg, std::prev(end));
+        while (!st.empty())
+        {
+
+            auto [left, right] = st.top();
+            st.pop();
+
+            InputIt it = Hoare_scheme(left, std::next(right), cmp);
+            if (left <= right)
+            {
+                st.emplace(left, std::next(it));
+                st.emplace(std::next(it), right);
+            }
+        }
     }
 
 }
