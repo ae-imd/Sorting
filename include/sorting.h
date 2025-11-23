@@ -13,11 +13,10 @@ namespace IMD
     template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
     InputIt Hoare_scheme(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
-        auto size = std::distance(beg, end);
-
-        if (size <= 1)
+        if (beg == end || std::next(beg) == end)
             return beg;
 
+        auto size = std::distance(beg, end);
         auto mid = std::next(beg, size / 2);
         auto last = std::prev(end);
 
@@ -51,9 +50,43 @@ namespace IMD
     }
 
     template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
+    InputIt Lomuto_scheme(InputIt beg, InputIt end, Comparator cmp = Comparator())
+    {
+        if (beg == end || std::next(beg) == end)
+            return beg;
+
+        auto last = std::prev(end);
+        auto mid = std::next(beg, std::distance(beg, end) / 2);
+
+        // The median of their three
+        if (cmp(*last, *beg))
+            std::iter_swap(beg, last);
+        if (cmp(*mid, *beg))
+            std::iter_swap(beg, mid);
+        if (cmp(*last, *mid))
+            std::iter_swap(mid, last);
+
+        std::iter_swap(mid, last);
+
+        auto pivot = *last;
+        InputIt i = beg;
+
+        for (InputIt j = beg; j != last; ++j)
+        {
+            if (cmp(*j, pivot))
+            {
+                std::iter_swap(i, j);
+                ++i;
+            }
+        }
+        std::iter_swap(i, last);
+        return i;
+    }
+
+    template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
     void bubble_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
-        if (std::distance(beg, end) <= 1)
+        if (beg == end || std::next(beg) == end)
             return;
         // cmp = <
 
@@ -76,10 +109,10 @@ namespace IMD
     template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
     void comb_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
-        size_t size = std::distance(beg, end);
-        if (size <= 1)
+        if (beg == end || std::next(beg) == end)
             return;
 
+        size_t size = std::distance(beg, end);
         size_t gap(size);
         double coeff(1.25);
         bool flag(true);
@@ -107,7 +140,7 @@ namespace IMD
     template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
     void insertion_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
-        if (std::distance(beg, end) <= 1)
+        if (beg == end || std::next(beg) == end)
             return;
         // cmp = <
 
@@ -129,9 +162,10 @@ namespace IMD
     template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
     void Shell_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
-        auto size = std::distance(beg, end);
-        if (size <= 1)
+        if (beg == end || std::next(beg) == end)
             return;
+
+        auto size = std::distance(beg, end);
 
         for (auto gap = size / 2; gap > 0; gap /= 2)
         {
@@ -158,9 +192,10 @@ namespace IMD
     template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
     void Shell_Knuth_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
-        auto size = std::distance(beg, end);
-        if (size <= 1)
+        if (beg == end || std::next(beg) == end)
             return;
+
+        auto size = std::distance(beg, end);
 
         auto gap = static_cast<decltype(size)>(1);
         while (gap < size / 3)
@@ -193,7 +228,7 @@ namespace IMD
     template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
     void selection_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
-        if (std::distance(beg, end) <= 1)
+        if (beg == end || std::next(beg) == end)
             return;
         // cmp = <
 
@@ -214,7 +249,7 @@ namespace IMD
     {
         static_assert(std::is_integral_v<typename std::iterator_traits<InputIt>::value_type>, "Counting sort requires integer types");
 
-        if (std::distance(beg, end) <= 1)
+        if (beg == end || std::next(beg) == end)
             return;
 
         auto min_max = std::minmax_element(beg, end);
@@ -239,7 +274,7 @@ namespace IMD
     template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
     void Hoare_recursive_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
-        if (std::distance(beg, end) <= 1)
+        if (beg == end || std::next(beg) == end)
             return;
 
         InputIt it = Hoare_scheme(beg, end, cmp);
@@ -250,23 +285,56 @@ namespace IMD
     template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
     void Hoare_iterative_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
-        if (std::distance(beg, end) <= 1)
+        if (beg == end || std::next(beg) == end)
             return;
 
         std::stack<std::pair<InputIt, InputIt>> st;
-        st.emplace(beg, std::prev(end));
+        st.emplace(beg, end);
+        while (!st.empty())
+        {
+            auto [left, right] = st.top();
+            st.pop();
+
+            if (std::distance(left, right) <= 1)
+                continue;
+
+            InputIt it = Hoare_scheme(left, right, cmp);
+            st.emplace(left, std::next(it));
+            st.emplace(std::next(it), right);
+        }
+    }
+
+    template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
+    void Lomuto_recursive_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
+    {
+        if (beg == end || std::next(beg) == end)
+            return;
+
+        InputIt it = Lomuto_scheme(beg, end, cmp);
+        Lomuto_recursive_sort(beg, it, cmp);
+        Lomuto_recursive_sort(std::next(it), end, cmp);
+    }
+
+    template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
+    void Lomuto_iterative_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
+    {
+        if (beg == end || std::next(beg) == end)
+            return;
+
+        std::stack<std::pair<InputIt, InputIt>> st;
+        st.emplace(beg, end);
         while (!st.empty())
         {
 
             auto [left, right] = st.top();
             st.pop();
 
-            InputIt it = Hoare_scheme(left, std::next(right), cmp);
-            if (left <= right)
-            {
-                st.emplace(left, std::next(it));
-                st.emplace(std::next(it), right);
-            }
+            if (std::distance(left, right) <= 1)
+                continue;
+
+            InputIt it = Lomuto_scheme(left, right, cmp);
+            st.emplace(left, it);
+            st.emplace(std::next(it), right);
         }
     }
 

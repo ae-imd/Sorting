@@ -18,6 +18,16 @@ void Hoare_iterative_sort_wrapper(int *beg, int *end)
     IMD::Hoare_iterative_sort(beg, end);
 }
 
+void Lomuto_recursive_sort_wrapper(int *beg, int *end)
+{
+    IMD::Lomuto_recursive_sort(beg, end);
+}
+
+void Lomuto_iterative_sort_wrapper(int *beg, int *end)
+{
+    IMD::Lomuto_iterative_sort(beg, end);
+}
+
 void Shell_sort_wrapper(int *beg, int *end)
 {
     IMD::Shell_sort(beg, end);
@@ -107,6 +117,9 @@ int main()
     int *arr = generate_random_array(AMOUNT, -1'000'000, 1'000'000);
     test_sort("Hoare Iterative Sort", Hoare_recursive_sort_wrapper, arr, AMOUNT);
     test_sort("Hoare Recursive Sort", Hoare_recursive_sort_wrapper, arr, AMOUNT);
+
+    test_sort("Lomuto Iterative Sort", Lomuto_iterative_sort_wrapper, arr, AMOUNT);
+    test_sort("Lomuto Recursive Sort", Lomuto_recursive_sort_wrapper, arr, AMOUNT);
 
     test_sort("Bubble Sort", bubble_sort_wrapper, arr, AMOUNT);
     test_sort("Comb Sort", comb_sort_wrapper, arr, AMOUNT);
