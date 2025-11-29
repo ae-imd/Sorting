@@ -3,6 +3,15 @@
 #include <random>
 #include <chrono>
 
+void merge_recursive_sort_wrapper(int *beg, int *end)
+{
+    IMD::merge_recursive_sort(beg, end);
+}
+void merge_iterative_sort_wrapper(int *beg, int *end)
+{
+    IMD::merge_iterative_sort(beg, end);
+}
+
 void bubble_sort_wrapper(int *beg, int *end)
 {
     IMD::bubble_sort(beg, end);
@@ -110,11 +119,14 @@ void test_sort(const std::string &alg_name, sort_func sf, int *arr, size_t size)
 
 int main()
 {
-    const size_t AMOUNT{1'000'000};
+    const size_t AMOUNT{10'000'000};
 
     std::cout << "Performance comparison on an array of " << AMOUNT << " elements:" << std::endl;
 
     int *arr = generate_random_array(AMOUNT, -1'000'000, 1'000'000);
+    test_sort("Merge Recursive Sort", merge_recursive_sort_wrapper, arr, AMOUNT);
+    test_sort("Merge Iterative Sort", merge_iterative_sort_wrapper, arr, AMOUNT);
+
     test_sort("Hoare Iterative Sort", Hoare_recursive_sort_wrapper, arr, AMOUNT);
     test_sort("Hoare Recursive Sort", Hoare_recursive_sort_wrapper, arr, AMOUNT);
 

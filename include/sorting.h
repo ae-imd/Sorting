@@ -84,6 +84,58 @@ namespace IMD
     }
 
     template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
+    void merge(InputIt beg, InputIt mid, InputIt end, Comparator cmp = Comparator())
+    {
+        using value_type = typename std::iterator_traits<InputIt>::value_type;
+
+        size_t left_size = std::distance(beg, mid);
+        size_t right_size = std::distance(mid, end);
+        size_t total_size = left_size + right_size;
+
+        value_type *tmp = new value_type[total_size];
+
+        InputIt it1 = beg, it2 = mid;
+        size_t idx = 0;
+        while (it1 != mid && it2 != end)
+        {
+            if (cmp(*it1, *it2))
+            {
+                tmp[idx] = std::move(*it1);
+                ++it1;
+            }
+            else
+            {
+                tmp[idx] = std::move(*it2);
+                ++it2;
+            }
+            ++idx;
+        }
+
+        while (it1 != mid)
+        {
+            tmp[idx] = std::move(*it1);
+            ++it1;
+            ++idx;
+        }
+
+        while (it2 != end)
+        {
+            tmp[idx] = std::move(*it2);
+            ++it2;
+            ++idx;
+        }
+
+        InputIt dest = beg;
+        for (size_t i(0); i < total_size; ++i)
+        {
+            *dest = std::move(tmp[i]);
+            ++dest;
+        }
+
+        delete[] tmp;
+    }
+
+    template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
     void bubble_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
     {
         if (beg == end || std::next(beg) == end)
@@ -338,6 +390,48 @@ namespace IMD
         }
     }
 
+    template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
+    void merge_recursive_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
+    {
+        auto size = std::distance(beg, end);
+        if (size <= 1)
+            return;
+
+        auto mid = std::next(beg, size / 2);
+
+        merge_recursive_sort(beg, mid, cmp);
+        merge_recursive_sort(mid, end, cmp);
+        merge(beg, mid, end, cmp);
+    }
+
+    template <typename InputIt, typename Comparator = std::less<typename std::iterator_traits<InputIt>::value_type>>
+    void merge_iterative_sort(InputIt beg, InputIt end, Comparator cmp = Comparator())
+    {
+        auto size = std::distance(beg, end);
+        if (size <= 1)
+            return;
+
+        for (size_t block_size = 1; block_size < size; block_size *= 2)
+        {
+            auto it = beg;
+
+            while (it != end)
+            {
+                auto left_beg = it;
+                auto left_end = std::next(it, std::min(block_size, static_cast<size_t>(std::distance(it, end))));
+
+                if (left_end == end)
+                    break;
+
+                auto right_beg = left_end;
+                auto right_end = std::next(right_beg, std::min(block_size, static_cast<size_t>(std::distance(right_beg, end))));
+
+                merge(left_beg, right_beg, right_end, cmp);
+
+                it = right_end;
+            }
+        }
+    }
 }
 
 #endif
